@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Convert Foto Produk - Setia Rasa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-amber-50 min-h-screen p-8 font-sans">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-2xl font-bold text-amber-800 mb-1">🍯 Convert Foto Produk</h1>
+    <p class="text-amber-600 text-sm mb-6">Pilih foto → copy hasilnya → paste ke <code class="bg-amber-100 px-1 rounded">app.js</code></p>
+
+    <div class="space-y-4" id="converters"></div>
+  </div>
+
+  <script>
+    const products = [
+      { id: 1, name: 'Jenang Ketan' },
+      { id: 2, name: 'Wajik Hijau' },
+      { id: 3, name: 'Madumongso' },
+      { id: 4, name: 'Kembang Gula' },
+      { id: 5, name: 'Enting-Enting Geti' },
+      { id: 6, name: 'Permen Tape' },
+      { id: 7, name: 'Brem' },
+      { id: 8, name: 'Sambel Pecel' },
+    ];
+
+    const container = document.getElementById('converters');
+
+    products.forEach(p => {
+      container.innerHTML += `
+        <div class="bg-white rounded-xl shadow p-4 flex items-center gap-4">
+          <img id="preview-${p.id}" src="" alt="" class="w-16 h-20 object-cover rounded-lg border-2 border-amber-200 hidden"/>
+          <div id="placeholder-${p.id}" class="w-16 h-20 bg-amber-100 rounded-lg border-2 border-dashed border-amber-300 flex items-center justify-center text-amber-400 text-xs text-center">Belum<br/>ada foto</div>
+          <div class="flex-1">
+            <p class="font-bold text-amber-800">${p.name}</p>
+            <label class="mt-2 inline-block cursor-pointer bg-amber-600 hover:bg-amber-500 text-white text-xs px-3 py-1.5 rounded-full transition">
+              📁 Pilih Foto
+              <input type="file" accept="image/*" class="hidden" onchange="convert(event, ${p.id})"/>
+            </label>
+          </div>
+          <div id="result-${p.id}" class="hidden flex-1">
+            <p class="text-xs text-gray-500 mb-1">Paste ke <code>img:</code> di app.js ↓</p>
+            <textarea id="code-${p.id}" rows="2" readonly
+              class="w-full text-xs border border-amber-200 rounded p-2 bg-amber-50 resize-none font-mono"></textarea>
+            <button onclick="copyCode(${p.id})" class="mt-1 text-xs bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded-full transition">
+              📋 Copy
+            </button>
+            <span id="copied-${p.id}" class="text-green-600 text-xs ml-2 hidden">✓ Tersalin!</span>
+          </div>
+        </div>`;
+    });
+
+    function convert(event, id) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64 = e.target.result;
+        // Preview
+        document.getElementById('preview-' + id).src = base64;
+        document.getElementById('preview-' + id).classList.remove('hidden');
+        document.getElementById('placeholder-' + id).classList.add('hidden');
+        // Hasil kode
+        document.getElementById('code-' + id).value = base64;
+        document.getElementById('result-' + id).classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function copyCode(id) {
+      const ta = document.getElementById('code-' + id);
+      ta.select();
+      document.execCommand('copy');
+      const label = document.getElementById('copied-' + id);
+      label.classList.remove('hidden');
+      setTimeout(() => label.classList.add('hidden'), 2000);
+    }
+  </script>
+</body>
+</html>
